@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { verifytoken } from "./jwt-auth";
-import { authTokensBlackList } from "../src/authenticationroutes";
-import { sql_db_pool_promise } from "../src/mysql";
+import { authTokensBlackList } from "../src/Controllers/authenticationroutes";
+import { sql_db_pool_promise } from "../src/database/mysql";
 
 declare global {
     namespace Express {
@@ -23,7 +23,7 @@ export const authenticationfilter = async(req: Request, res: Response, next: Nex
     
     try {
         // Vérifier si le token est dans la base de données blacklistée
-        const sqlRequest = "SELECT * FROM tokens_blacklist WHERE token = ?";
+        const sqlRequest = "SELECT * FROM blacklist_tokens WHERE token = ?";
         const [result] = await sql_db_pool_promise.execute(sqlRequest, [token]) as any[];
         if (result.length > 0) {
             return res.status(401).json({ message: "Unauthorized. This token is blacklisted" });
@@ -50,7 +50,7 @@ export const authorizeRole = (role: 'admin' | 'lecteur') => {
 
         try {
             // Je récupère mtn le role de l'utilisateur 
-            const sqlRequest = "SELECT role FROM users WHERE id = ?";
+            const sqlRequest = "SELECT role FROM user WHERE id = ?";
             const [result] = await sql_db_pool_promise.execute(sqlRequest, [userId]) as any[];
 
             if (result.length === 0) {
@@ -61,7 +61,7 @@ export const authorizeRole = (role: 'admin' | 'lecteur') => {
             const userRole = result[0].role;
 
             if (userRole !== role) {
-                res.status(403).json({ message: "Attention vous n'avez pas les role requis pour effectuer cet action" });
+                res.status(403).json({ message: "Attention vous n'avez pas les roles requis pour effectuer cet action" });
                 return;
             }
 

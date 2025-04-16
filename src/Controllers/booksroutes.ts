@@ -1,9 +1,9 @@
 import express from 'express';
 import {Request, Response} from 'express';
-import {Book} from './modeles/Book';
-import {sql_db_pool_promise} from "./mysql";
-import {authenticationfilter} from "../security/auth-filter";
-import {authorizeRole} from "../security/auth-filter";
+import {Book} from '../models/Book';
+import {sql_db_pool_promise} from "../database/mysql";
+import {authenticationfilter} from "../../security/auth-filter";
+import {authorizeRole} from "../../security/auth-filter";
 
 //const appExpress = express();
 const BookRouter = express.Router();
@@ -18,7 +18,7 @@ BookRouter.post("", authenticationfilter, authorizeRole('admin'), async(req : Re
     }
     try {
        
-        const sqlRequest : string = "INSERT INTO books(title, author, isbn, available, user_id) values(?, ?, ?, ?, ?)";
+        const sqlRequest : string = "INSERT INTO book(title, author, isbn, available, user_id) values(?, ?, ?, ?, ?)";
         const [result] = await sql_db_pool_promise.execute(
             sqlRequest,
             [book.title, book.author,  book.isbn, book.available, book.user_id]
@@ -37,7 +37,7 @@ BookRouter.post("", authenticationfilter, authorizeRole('admin'), async(req : Re
 
 BookRouter.get("", authenticationfilter, async(req : Request, res :Response)  =>{
     try {
-        const sqlRequest : string = "SELECT * FROM books";
+        const sqlRequest : string = "SELECT * FROM book";
         const [result] = await sql_db_pool_promise.execute(sqlRequest);
         res.status(200).json(result);
         return;
@@ -48,12 +48,12 @@ BookRouter.get("", authenticationfilter, async(req : Request, res :Response)  =>
     }
 });
 
-//RETRIEVE : Récupérer un livre par son ID   i
+//RETRIEVE : Récupérer un livre par son ID   
 BookRouter.get("/:id", authenticationfilter,  async(req : Request, res :Response)  =>{
     const id = req.params['id'];
 
     try {
-        const sqlRequest : string = "SELECT * FROM books WHERE id = ?";
+        const sqlRequest : string = "SELECT * FROM book WHERE id = ?";
         const [result] = await sql_db_pool_promise.execute(sqlRequest, [id])as any[];
         if (result['length'] === 0){
             res.status(404).json({message : "Livre non retrouvé "})
@@ -78,7 +78,7 @@ BookRouter.put("/:id", authenticationfilter, authorizeRole('admin'), async(req :
         return;
     }
     try {
-        const sqlRequest : string = "UPDATE books SET title = ?, author = ?,  isbn = ?, available = ?, user_id = ? WHERE id = ?";
+        const sqlRequest : string = "UPDATE book SET title = ?, author = ?,  isbn = ?, available = ?, user_id = ? WHERE id = ?";
         const [result] = await sql_db_pool_promise.execute(
             sqlRequest,
             [book.title, book.author, book.isbn, book.available, book.user_id, id]
@@ -101,7 +101,7 @@ BookRouter.delete("/:id", authenticationfilter, authorizeRole('admin'), async(re
     const id = req.params['id'];
     const book = req.body as Book;
     try {
-        const sqlRequest : string = "DELETE FROM books WHERE id = ?";
+        const sqlRequest : string = "DELETE FROM book WHERE id = ?";
         const [result] = await sql_db_pool_promise.execute(
             sqlRequest,
             [id]

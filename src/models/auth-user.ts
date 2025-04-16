@@ -1,4 +1,4 @@
-import {sql_db_pool_promise} from "../mysql";
+import {sql_db_pool_promise} from "../database/mysql";
 const bcrypt = require('bcrypt');
 
 async function createUser(email: string, password: string, role: string = 'lecteur'){
@@ -6,7 +6,7 @@ async function createUser(email: string, password: string, role: string = 'lecte
     const hashedPassword = await bcrypt.hash(password, salt)
 
     const [result]=await sql_db_pool_promise.execute(
-        'INSERT INTO users (email, password, role) VALUES (?, ?, ?)', [email, hashedPassword, role]
+        'INSERT INTO user (email, password, role) VALUES (?, ?, ?)', [email, hashedPassword, role]
     );
 }
 

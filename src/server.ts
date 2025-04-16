@@ -1,8 +1,8 @@
 import express from 'express';
-import {apiAuthRouter} from "./authenticationroutes";
-import {apiBookRouter} from "./booksroutes";
-import {apiBorrowRouter} from "./borrowroutes";
-import {apiUserRouter} from "./usersroutes";
+import {apiAuthRouter} from "./Controllers/authenticationroutes";
+import {apiBookRouter} from "./Controllers/booksroutes";
+import {apiBorrowRouter} from "./Controllers/borrowroutes";
+import {apiUserRouter} from "./Controllers/usersroutes";
 const appExpress = express();
 
 appExpress.use(express.json());
